@@ -49,9 +49,9 @@ docker push ic-registry.epfl.ch/mlo/ml:1.0
 
 ### Some deployment template
 You can find some provided templates, e.g.,
-* [`job` mode](https://github.com/epfml/kubernetes-setup/templates/pod_job).
-* [`standalone` mode](https://github.com/epfml/kubernetes-setup/templates/pod_standalone).
-* [`cluster` mode](https://github.com/epfml/kubernetes-setup/templates/pod_cluster).
+* [`job` mode](https://github.com/epfml/kubernetes-setup/tree/master/templates/pod-job).
+* [`standalone` mode](https://github.com/epfml/kubernetes-setup/tree/master/templates/pod_standalone).
+* [`cluster` mode](https://github.com/epfml/kubernetes-setup/tree/master/templates/pod-cluster).
 
 
 ## Some Tips
