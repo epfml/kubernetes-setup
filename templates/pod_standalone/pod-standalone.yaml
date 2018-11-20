@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: user_id-master
+  labels:
+    name: user_id-master
+    role: master
+    user: user_id
+spec:
+  containers:
+    - name:  user_id-master
+      image: ic-registry.epfl.ch/mlo/pytorch-mpi:cuda9
+      imagePullPolicy: Always
+      command:
+       - "/bin/bash"
+       - "-c"
+       - "--"
+      args :
+       - '/entrypoint.sh; sleep infinity'
+      ports:
+        - containerPort: 8888
+          name: notebook
+        - containerPort: 6006
+          name: tensorboard
+        - containerPort: 22
+          name: ssh
+      env:
+        - name: ROLE
+          value: master
+      resources:
+        limits:
+          nvidia.com/gpu: 1
+      volumeMounts:
+        - mountPath: /mlodata1
+          name: mlodata
+  volumes:
+    - name: mlodata
+      persistentVolumeClaim:
+        claimName: mlo-scratch
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lin-master
+  labels:
+    name: lin-master
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8888
+      name: notebook
+    - port: 6006
+      name: tensorboard
+    - port: 22
+      name: ssh
+  selector:
+    name: lin-master

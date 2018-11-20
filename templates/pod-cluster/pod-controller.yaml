@@ -1,0 +1,45 @@
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: user_id_worker
+  labels:
+    name: user_id-worker
+    user: user_id
+spec:
+  selector:
+    matchLabels:
+      name: user_id-worker
+  serviceName: user_id-worker
+  replicas: 0
+  template:
+    metadata:
+      labels:
+        name: user_id-worker
+        user: user_id
+    spec:
+      containers:
+        - name: user_id-worker
+          image: ic-registry.epfl.ch/mlo/pytorch-mpi:cuda9
+          imagePullPolicy: Always
+          command:
+           - "/bin/bash"
+           - "-c"
+           - "--"
+          args :
+            - '/entrypoint.sh; /usr/local/bin/entrypoint.sh; sleep infinity'
+          ports:
+            - containerPort: 22
+              name: ssh
+          resources:
+            limits:
+              nvidia.com/gpu: 2
+          env:
+            - name: ROLE
+              value: worker
+          volumeMounts:
+            - mountPath: /mlodata1
+              name: mlodata
+      volumes:
+        - name: mlodata
+          persistentVolumeClaim:
+            claimName: mlo-scratch

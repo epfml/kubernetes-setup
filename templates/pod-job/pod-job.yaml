@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job_id
+  labels:
+    app: app_id
+    user: user_id
+spec:
+  template:
+    metadata:
+      labels:
+        app: app_id
+        user: user_id
+    spec:
+      restartPolicy: Never
+      containers:
+        - name:  job_name
+          image: ic-registry.epfl.ch/mlo/your_image
+          imagePullPolicy: Always
+          env:
+            - name: ROLE
+              value: worker
+          volumeMounts:
+            - mountPath: /mlodata1
+              name: mlodata
+          resources:
+            limits:
+              nvidia.com/gpu: 0
+          command: [
+            "/entrypoint.sh", "bash",
+            "your_job.sh"
+          ]
+      volumes:
+        - name: mlodata
+          persistentVolumeClaim:
+            claimName: mlo-scratch
+  backoffLimit: 4
