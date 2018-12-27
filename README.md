@@ -37,6 +37,20 @@ volumes:
    claimName: mlo-scratch
 ```
 
+### Storage across icclusters (`mounting /mlodata1`)
+```yaml
+spec:
+  volumes:
+  - name: mlodata1
+    persistentVolumeClaim:
+      claimName: pv-mlodata1
+  containers:
+  - name:  ubuntu
+    volumeMounts:
+    - mountPath: /mlodata1
+      name: mlodata1
+```
+
 ### Custom your own docker image
 Go to `https://ic-registry.epfl.ch` and use your gaspar to login in.
 
@@ -50,9 +64,8 @@ docker push ic-registry.epfl.ch/mlo/ml:1.0
 ### Some deployment template
 You can find some provided templates, e.g.,
 * [`job` mode](https://github.com/epfml/kubernetes-setup/tree/master/templates/pod-job).
-* [`standalone` mode](https://github.com/epfml/kubernetes-setup/tree/master/templates/pod_standalone).
+* [`standalone` mode](https://github.com/epfml/kubernetes-setup/tree/master/templates/pod-standalone).
 * [`cluster` mode](https://github.com/epfml/kubernetes-setup/tree/master/templates/pod-cluster).
-
 
 ## Some Tips
 * By default, a Docker container will run as root. This means that the files you write in the shared storage are owned by root. You can solve this by changing the default user in Docker ([example from Tao](https://github.com/IamTao/beta-kubernetes/blob/29515feb07e953bf602339a7548461aeeaa59de2/images/base/Dockerfile#L56-L72))
