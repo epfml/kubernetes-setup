@@ -7,7 +7,8 @@ Use [this form](https://support.epfl.ch/help?id=epfl_sc_cat_item&sys_id=8cd2b928
 
 Once you have been approved, you will get an email from the IC with a zip file named <your-name>.zip.
 Unzip it and put these files into the `.kube` folder of your home directory. Then rename `<your-name>.config` to `config`.
-```
+ 
+```bash
 cd ~
 mkdir .kube
 # Save your-name.zip in the .kube folder
@@ -31,7 +32,7 @@ Check that it is working by running:
 kubectl get pods
 ```
 
-## Kubernetes basics
+## Setting up Kubernetes
 
 To use a kubernetes pod, you need to:
  - Create a dockerfile with your needed config
@@ -42,7 +43,7 @@ To use a kubernetes pod, you need to:
  
 ### Creating a dockerfile
 
-If you are new to docker, have a look at this very simple [Dockerfile](todo). You should guess what is happening and add your own config.
+If you are new to docker, have a look at this very simple [Dockerfile](https://github.com/epfml/kubernetes-setup/blob/master/templates/pod-simple/Dockerfile). You should guess what is happening and add your own config.
 
 Put your gaspar id after `NB_USER=` and your uid after `NB_UID=`.\
 You can get you uid by using the `id` commmand on a cluster.
@@ -55,13 +56,18 @@ Once you are happy with the Dockerfile, go to the directory of the Dockerfile an
 ```bash
 docker build . -t <your-tag>
 ```
-Replace `<your-tag>` by the name you want to give to this docker image. It is good practice to put your name first, for example `jaggi-base`.
+Replace `<your-tag>` by the name you want to give to this docker image.\
+It is good practice to put your name first, for example `jaggi_base`.
 
 ### Pushing the Docker image
 When you will create a pod, the server will need a Docker image to build a container for you.\
 The server will go look for the docker image on https://ic-registry.epfl.ch/, so you should put your Docker image there.
 
-#### Login to ic-registry.epfl.ch/mlo/
+Go have a look at https://ic-registry.epfl.ch and use your gaspar credentials to login in.
+
+There already is a group project named `mlo`. Please ask someone in the lab already using kubernetes to add you to the mlo group so that you can push your docker image to that repository.
+
+#### Login docker to ic-registry.epfl.ch/mlo/
 Login to the server by running the following command and entering your epfl credentials:
 ```bash
 docker login ic-registry.epfl.ch
@@ -77,9 +83,9 @@ docker push ic-registry.epfl.ch/mlo/<your-tag>
 ```
 
 ### Creating a kubernetes config file
-Have a look at (and download) this simple [kubernetes config file](todo).
-Fill all elements that are in brackets.\
-`<your-pod-name>` needs not be the same as `<your-docker-image-tag>` but again it is good practice to put your name first for the pod name.
+Have a look at (and download) this simple [kubernetes config file](https://github.com/epfml/kubernetes-setup/blob/master/templates/pod-simple/pod-gpu-mlodata.yaml).
+Fill all elements that are in \<brackets\> .\
+`<your-pod-name>` needs not be the same as `<your-docker-image-tag>` but again it is good practice to put your name first for the pod name, for example `jaggi-pod`.
 
 In this config file,
  - you can change: `nvidia.com/gpu: 1` to request more gpus.\
@@ -100,35 +106,34 @@ There are two approaches to running pods on the container cluster:
 * Use something like `command: [run, my, experiment]`.
     * This makes debugging slightly harder, but as soon as your job finishes, the pod gets status `Completed`, and you (Martin) will stop paying for the pod.
 
+## Using Kubernetes
 ### Creating a pod
 Go to the directory where your kubernetes config file is and run:
 ```bash
 kubectl create -f <your-configfile-name>.yaml
 ```
 
-#### Useful kubernetes commands
-Check which pods are running
+### hecking which pods are running
 ```bash
 kubectl get pods  # get all pods
 kubectl get pods -l user=jaggi  # filter by label (defined in the config file)
 kubectl get pod jaggi-pod  # get by pod name
 ```
 
-Delete a pod:
+### Deleting a pod:
 ```
 kubectl delete pod jaggi-pod
 ```
 
-Debug a pod:
+### Debuging a pod:
 ```bash
 kubectl describe pod jaggi-pod
 kubectl get pod jaggi-pod -o yaml
 ```
 
 
-
-### Note on Storage across icclusters
-#### (`mounting /mlo-container-scratch`)
+## Note on Storage across icclusters
+### (`mounting /mlo-container-scratch`)
 Follow the instructions in `Kubernetes basics`, and use
 ```yaml
 volumeMounts:
@@ -145,7 +150,7 @@ volumes:
    persistentVolumeClaim:
    claimName: mlo-scratch
 ```
-#### (`mounting /mlodata1`)
+### (`mounting /mlodata1`)
 ```yaml
 spec:
   volumes:
@@ -159,21 +164,13 @@ spec:
       name: mlodata1
 ```
 
-### Custom your own docker image
-Go to `https://ic-registry.epfl.ch` and use your gaspar to login in.
 
-There already has a group project named `mlo`. Please ask the owner of the group project to give you the corresponding permission so that you can push your docker image to that repository.
-
-Once you get the image and have the permission, you can push to the remote host, e.g.,
-```sh
-docker push ic-registry.epfl.ch/mlo/ml:1.0
-```
-
-### Some deployment template
+## Some deployment template
 You can find some provided templates, e.g.,
 * [`job` mode](https://github.com/epfml/kubernetes-setup/tree/master/templates/pod-job).
 * [`standalone` mode](https://github.com/epfml/kubernetes-setup/tree/master/templates/pod-standalone).
 * [`cluster` mode](https://github.com/epfml/kubernetes-setup/tree/master/templates/pod-cluster).
+
 
 ## Some Tips
 * By default, a Docker container will run as root. This means that the files you write in the shared storage are owned by root. You can solve this by changing the default user in Docker ([example from Tao](https://github.com/IamTao/beta-kubernetes/blob/29515feb07e953bf602339a7548461aeeaa59de2/images/base/Dockerfile#L56-L72))
