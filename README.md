@@ -1,6 +1,16 @@
-Instruction of using the container cluster (Kubernetes, k8s)
+Instruction for using the container cluster (Kubernetes, k8s)
+
+You can refer to [this repository](https://github.com/EPFL-IC/caas) for more information, below are steps for most common setups.
 
 ---
+
+## Table of Contents
+- [Requesting access](#requesting-access)
+- [Installing Kubernetes](#installing-kubernetes)
+- [Setting up Kubernetes](#setting-up-kubernetes)
+- [Using Kubernetes](#setting-up-kubernetes)
+- [Note on Storage across icclusters](#note-on-storage-across-icclusters)
+- [Some deployment templates](#some-deployment-templates)
 
 ## Requesting access
 Use [this form](https://support.epfl.ch/help?id=epfl_sc_cat_item&sys_id=8cd2b9284f1b1b00fe35adee0310c769&sysparm_category=7707db6d4fd94300fe35adee0310c708) to request access (use Accréditation=MLO).
@@ -15,10 +25,9 @@ mkdir .kube
 mv .kube/*.config .kube/config
 ```
 
-You can refer to [this repository](https://github.com/EPFL-IC/caas) for more information, below are steps for most common setups.
+## Installing Kubernetes
 
-## Installing Kubernetes (Ubuntu/Debian)
-
+### Ubuntu/Debian
 ```bash
 sudo apt-get update && sudo apt-get install -y apt-transport-https
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
@@ -32,14 +41,22 @@ Check that it is working by running:
 kubectl get pods
 ```
 
+### MacOS
+```bash
+brew install kubernetes-cli
+```
+
+### Others
+Follow instructions on [the kubernetes docs](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl).
+
+
 ## Setting up Kubernetes
 
 To use a kubernetes pod, you need to:
- - Create a dockerfile with your needed config
- - Build this docker image
- - Push the docker image to ic-registry.epfl.ch/mlo/
- - Create a kubernetes config file
- - Create a pod
+ - [Create a dockerfile with your needed config](#creating-a-dockerfile)
+ - [Build this docker image](#building-the-docker-image)
+ - [Push the docker image to ic-registry.epfl.ch/mlo/](#pushing-the-docker-image)
+ - [Create a kubernetes config file](#creating-a-kubernetes-config-file)
  
 ### Creating a dockerfile
 
@@ -88,23 +105,34 @@ Fill all elements that are in \<brackets\> .\
 `<your-pod-name>` needs not be the same as `<your-docker-image-tag>` but again it is good practice to put your name first for the pod name, for example `jaggi-pod`.
 
 In this config file,
- - you can change: `nvidia.com/gpu: 1` to request more gpus.\
- - you can see at the end that mlodata1 is mounted. You can remove it or change it for mloscratch.
- - you specify which command is run when launching the pod. Here it will sleep for 60 seconds and then die.
+ - you can change: `nvidia.com/gpu: 1` to request more gpus
+ - you can see at the end that mlodata1 is mounted. You can remove it or change it for mloscratch
+ - you specify which command is run when launching the pod. Here it will sleep for 60 seconds and then stop
  
-To run more complex or multiple commands, you can do:
-```yaml
- command: ["/bin/bash", "-c"]
- args: ["command1; command2 && command3"]
-```
+ #### Commands
 
-#### Approaches to running a job
-There are two approaches to running pods on the container cluster:
-* Like in the `Kubernetes basics`, with command: `[sleep, infinity]`, and then connecting to the pod over ssh to run an experiment
-    * This can be convenient for playing around. You can temporarily spin up as many nodes as you want
-    * But you pay GPU time you don't use.
-* Use something like `command: [run, my, experiment]`.
-    * This makes debugging slightly harder, but as soon as your job finishes, the pod gets status `Completed`, and you (Martin) will stop paying for the pod.
+- To have a container run forever, you can use:
+   ```yaml
+   command: [sleep, infinity]
+  ```
+  and then you can [connect to the pod through ssh](#ssh-to-a-pod) and run your jobs from there.
+
+  **If you do this, make sure to [delete the pod](#deleting-a-pod) once you are done to free the resource !**
+
+- To run more complex or multiple commands, you can do:
+  ```yaml
+   command: ["/bin/bash", "-c"]
+   args: ["command1; command2 && command3"]
+  ```
+
+  For example:
+  ```yaml
+   command: ["/bin/bash", "-c"]
+   args: ["cd /mlodata1/jaggi/ml && python automl.py"]
+  ```
+
+  _The resource will be automatically freed once the command has run. The pod gets status `Completed` but is not deleted._
+
 
 ## Using Kubernetes
 ### Creating a pod
@@ -113,11 +141,16 @@ Go to the directory where your kubernetes config file is and run:
 kubectl create -f <your-configfile-name>.yaml
 ```
 
-### hecking which pods are running
+### Checking pods status
 ```bash
 kubectl get pods  # get all pods
 kubectl get pods -l user=jaggi  # filter by label (defined in the config file)
 kubectl get pod jaggi-pod  # get by pod name
+```
+
+### SSH to a pod
+```bash
+kubectl exec -it jaggi-pod /bin/bash
 ```
 
 ### Deleting a pod:
@@ -125,12 +158,12 @@ kubectl get pod jaggi-pod  # get by pod name
 kubectl delete pod jaggi-pod
 ```
 
-### Debuging a pod:
+### Getting information on a pod:
+Useful for debugging
 ```bash
 kubectl describe pod jaggi-pod
 kubectl get pod jaggi-pod -o yaml
 ```
-
 
 ## Note on Storage across icclusters
 ### (`mounting /mlo-container-scratch`)
@@ -165,14 +198,14 @@ spec:
 ```
 
 
-## Some deployment template
+## Some deployment templates
 You can find some provided templates, e.g.,
 * [`job` mode](https://github.com/epfml/kubernetes-setup/tree/master/templates/pod-job).
 * [`standalone` mode](https://github.com/epfml/kubernetes-setup/tree/master/templates/pod-standalone).
 * [`cluster` mode](https://github.com/epfml/kubernetes-setup/tree/master/templates/pod-cluster).
 
 
-## Some Tips
+## Some Tips (deprecated)
 * By default, a Docker container will run as root. This means that the files you write in the shared storage are owned by root. This is solved by changing the default user in Docker (which is already done in the simple [Dockerfile](https://github.com/epfml/kubernetes-setup/blob/master/templates/pod-simple/Dockerfile#L32-L45))
 (Here another [example from Tao](https://github.com/IamTao/beta-kubernetes/blob/29515feb07e953bf602339a7548461aeeaa59de2/images/base/Dockerfile#L56-L72))
 * To avoid the error `sudo: no tty present and no askpass program specified`, please use `sudo -S xxx`.
