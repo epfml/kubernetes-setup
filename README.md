@@ -63,7 +63,7 @@ To use a kubernetes pod, you need to:
 If you are new to docker, have a look at this very simple [Dockerfile](https://github.com/epfml/kubernetes-setup/blob/master/templates/pod-simple/Dockerfile). You should guess what is happening and add your own config.
 
 Put your gaspar id after `NB_USER=` and your uid after `NB_UID=`.\
-You can get you uid by using the `id` commmand on a cluster.
+You can get you uid by using the `id` command on a cluster.
 
 The `FROM` line allows you to choose an image to start from. You can choose from images on the [Dockerhub](https://hub.docker.com/) (or elsewhere).
 
@@ -163,6 +163,7 @@ Useful for debugging
 ```bash
 kubectl describe pod jaggi-pod
 kubectl get pod jaggi-pod -o yaml
+kubectl logs jaggi-pod
 ```
 
 ## Note on Storage across icclusters
