@@ -173,5 +173,6 @@ You can find some provided templates, e.g.,
 
 
 ## Some Tips
-* By default, a Docker container will run as root. This means that the files you write in the shared storage are owned by root. You can solve this by changing the default user in Docker ([example from Tao](https://github.com/IamTao/beta-kubernetes/blob/29515feb07e953bf602339a7548461aeeaa59de2/images/base/Dockerfile#L56-L72))
+* By default, a Docker container will run as root. This means that the files you write in the shared storage are owned by root. This is solved by changing the default user in Docker (which is already done in the simple [Dockerfile](https://github.com/epfml/kubernetes-setup/blob/master/templates/pod-simple/Dockerfile#L32-L45))
+(Here another [example from Tao](https://github.com/IamTao/beta-kubernetes/blob/29515feb07e953bf602339a7548461aeeaa59de2/images/base/Dockerfile#L56-L72))
 * To avoid the error `sudo: no tty present and no askpass program specified`, please use `sudo -S xxx`.
