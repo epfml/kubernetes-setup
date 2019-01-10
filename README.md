@@ -10,7 +10,7 @@ You can refer to [this repository](https://github.com/EPFL-IC/caas) for more inf
 - [Setting up Kubernetes](#setting-up-kubernetes)
 - [Using Kubernetes](#using-kubernetes)
 - [Note on Storage across icclusters](#note-on-storage-across-icclusters)
-- [Some deployment templates](#some-deployment-templates)
+- [Other resources and deployment templates](#other-resources-and-deployment-templates)
 
 ## Requesting access
 Use [this form](https://support.epfl.ch/help?id=epfl_sc_cat_item&sys_id=8cd2b9284f1b1b00fe35adee0310c769&sysparm_category=7707db6d4fd94300fe35adee0310c708) to request access (use Accréditation=MLO).
@@ -53,12 +53,12 @@ Follow instructions on [the kubernetes docs](https://kubernetes.io/docs/tasks/to
 ## Setting up Kubernetes
 
 To use a kubernetes pod, you need to:
- - [Create a dockerfile with your needed config](#creating-a-dockerfile)
- - [Build this docker image](#building-the-docker-image)
+ - [Create a Dockerfile with your needed config](#creating-a-dockerfile)
+ - [Build a Docker image](#building-a-docker-image)
  - [Push the docker image to ic-registry.epfl.ch/mlo/](#pushing-the-docker-image)
  - [Create a kubernetes config file](#creating-a-kubernetes-config-file)
  
-### Creating a dockerfile
+### Creating a Dockerfile
 
 If you are new to docker, have a look at this very simple [Dockerfile](https://github.com/epfml/kubernetes-setup/blob/master/templates/pod-simple/Dockerfile). You should guess what is happening and add your own config.
 
@@ -67,13 +67,13 @@ You can get you uid by using the `id` command on a cluster.
 
 The `FROM` line allows you to choose an image to start from. You can choose from images on the [Dockerhub](https://hub.docker.com/) (or elsewhere).
 
-### Building the Docker image
+### Building a Docker image
 
 Once you are happy with the Dockerfile, go to the directory of the Dockerfile and run:
 ```bash
 docker build . -t <your-tag>
 ```
-Replace `<your-tag>` by the name you want to give to this docker image.\
+Replace `<your-tag>` by the name you want to give to this Docker image.\
 It is good practice to put your name first, for example `jaggi_base`.
 
 ### Pushing the Docker image
@@ -82,9 +82,9 @@ The server will go look for the docker image on https://ic-registry.epfl.ch/, so
 
 Go have a look at https://ic-registry.epfl.ch and use your gaspar credentials to login in.
 
-There already is a group project named `mlo`. Please ask someone in the lab already using kubernetes to add you to the mlo group so that you can push your docker image to that repository.
+There already is a group project named `mlo`. Please ask someone in the lab already using kubernetes to add you to the mlo group so that you can push your Docker image to that repository.
 
-#### Login docker to ic-registry.epfl.ch/mlo/
+#### Login Docker to ic-registry.epfl.ch/mlo/
 Login to the server by running the following command and entering your epfl credentials:
 ```bash
 docker login ic-registry.epfl.ch
@@ -199,12 +199,17 @@ spec:
 ```
 
 
-## Some deployment templates
-You can find some provided templates, e.g.,
+## Other Resources and deployment templates
+Here you can find some kubernetes templates:
 * [`job` mode](https://github.com/epfml/kubernetes-setup/tree/master/templates/pod-job).
 * [`standalone` mode](https://github.com/epfml/kubernetes-setup/tree/master/templates/pod-standalone).
 * [`cluster` mode](https://github.com/epfml/kubernetes-setup/tree/master/templates/pod-cluster).
 
+And some personalized Dockerfile:
+- [A Dockerfile from Thijs](https://github.com/epfml/job-monitor/blob/master/docker/worker/Dockerfile)
+- [A Dockerfile from Tao](https://github.com/IamTao/beta-kubernetes/blob/master/images/base/Dockerfile)
+
+and some more [documentation from Tao's github](https://github.com/IamTao/beta-kubernetes).
 
 ## Some Tips (deprecated)
 * By default, a Docker container will run as root. This means that the files you write in the shared storage are owned by root. This is solved by changing the default user in Docker (which is already done in the simple [Dockerfile](https://github.com/epfml/kubernetes-setup/blob/master/templates/pod-simple/Dockerfile#L32-L45))
