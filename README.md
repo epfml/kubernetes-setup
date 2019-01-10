@@ -153,12 +153,12 @@ kubectl get pod jaggi-pod  # get by pod name
 kubectl exec -it jaggi-pod /bin/bash
 ```
 
-### Deleting a pod:
+### Deleting a pod
 ```
 kubectl delete pod jaggi-pod
 ```
 
-### Getting information on a pod:
+### Getting information on a pod
 Useful for debugging
 ```bash
 kubectl describe pod jaggi-pod
