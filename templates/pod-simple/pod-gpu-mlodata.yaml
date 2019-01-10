@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: <your-pod-name>
+  labels:
+    user: <your-name>
+spec:
+  restartPolicy: Never
+  securityContext:
+    runAsUser: <your-uid>
+    fsGroup: 11169
+  containers:
+  - name:  ubuntu-gpu
+    image: ic-registry.epfl.ch/mlo/<your-docker-image-tag>
+    command:
+      - sleep
+      - "60"
+    resources:
+      limits:
+        nvidia.com/gpu: 1 # requesting 1 GPU
+    volumeMounts:
+      - mountPath: /mlodata1
+        name: mlodata1
+  volumes:
+    - name: mlodata1
+      persistentVolumeClaim:
+        claimName: pv-mlodata1
