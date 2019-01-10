@@ -8,7 +8,7 @@ You can refer to [this repository](https://github.com/EPFL-IC/caas) for more inf
 - [Requesting access](#requesting-access)
 - [Installing Kubernetes](#installing-kubernetes)
 - [Setting up Kubernetes](#setting-up-kubernetes)
-- [Using Kubernetes](#setting-up-kubernetes)
+- [Using Kubernetes](#using-kubernetes)
 - [Note on Storage across icclusters](#note-on-storage-across-icclusters)
 - [Some deployment templates](#some-deployment-templates)
 
