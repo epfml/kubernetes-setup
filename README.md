@@ -17,7 +17,7 @@ Use [this form](https://support.epfl.ch/help?id=epfl_sc_cat_item&sys_id=8cd2b928
 
 Once you have been approved, you will get an email from the IC with a zip file named <your-name>.zip.
 Unzip it and put these files into the `.kube` folder of your home directory. Then rename `<your-name>.config` to `config`.
- 
+
 ```bash
 cd ~
 mkdir .kube
@@ -57,7 +57,7 @@ To use a kubernetes pod, you need to:
  - [Build a Docker image](#building-a-docker-image)
  - [Push the docker image to ic-registry.epfl.ch/mlo/](#pushing-the-docker-image)
  - [Create a kubernetes config file](#creating-a-kubernetes-config-file)
- 
+
 ### Creating a Dockerfile
 
 If you are new to docker, have a look at this very simple [Dockerfile](https://github.com/epfml/kubernetes-setup/blob/master/templates/pod-simple/Dockerfile). You should guess what is happening and add your own config.
@@ -85,10 +85,21 @@ Go have a look at https://ic-registry.epfl.ch and use your gaspar credentials to
 There already is a group project named `mlo`. Please ask someone in the lab already using kubernetes to add you to the mlo group so that you can push your Docker image to that repository.
 
 #### Login Docker to ic-registry.epfl.ch/mlo/
-Login to the server by running the following command and entering your epfl credentials:
+
+Login to the server by running the following command
+
 ```bash
 docker login ic-registry.epfl.ch
 ```
+
+and enter the credentials:
+
+Username: `robot$mlo-image-publisher`
+Password:
+```
+eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODg5MjIwNjEsImlhdCI6MTU4NjMzMDA2MSwiaXNzIjoiaGFyYm9yLXRva2VuLWlzc3VlciIsImlkIjozLCJwaWQiOjYsImFjY2VzcyI6W3siUmVzb3VyY2UiOiIvcHJvamVjdC82L3JlcG9zaXRvcnkiLCJBY3Rpb24iOiJwdXNoIiwiRWZmZWN0IjoiIn1dfQ.RI9AhLg94Y1piWKZ4cR-UWOFw39fX3NnuoPM93Ux6T2BR6azMYNUDGSSD8-p17dX82UkaJ4jAYfa19b6e1VudT-YM21QWjbWjWnnnpLfe0wEpL8Y9ddP8kbgfWzhZKxt_RNe8Wl7QjTxQYjp-bdKw1CY1v8NGoltf3nILLYbr8g4RiODQsB-XBCVfCxFUZcQkhy39hq9ckPbEs3jh2HuN7s3IRQGfRAbkQ5DKo1wp967Zkf1LYopF6-W8hZyWq69XzsqixX6UaF8izaZVCGkqPqw1DlgKp6Lropwnb8GT9TjV_kUfX6A6Ju3yEgBtcFEOWCKDYeRlFgPuu1DW3Sy7dnHeDOUNvSeB8ANgY-QesSasQ8LSrFjIcsG9fZ8I_NBCx0CEQCenoRMQHpUqDFZoyFbMaq8zrEO9yshEhHggLoTTd6GHDByxqmWN15dfCZrHHGKmSwW34t5q_a6fsELuAtCmy8j-FvdbB3zQiJF8dj58DKDbIya4R8GdoFq0hOUopZsetUpHAhMwnJ3TRJrJVo7IXzzjT6i5q85qoOHEwPpr0UJHK05zGSXsjoKzTMG26togEnd6GlApuzWpEF21f0eYHib-pkJY1oCcQpobiFKrSwvcYVyjUMaxFMLm1le16Lpk83CEXgstSgSPx_lB1qwMK7zauqpFhrHI-Fc7mQ
+```
+
 This is a 'one-in-a-lifetime' steps.
 
 #### Actually pushing the Docker image
@@ -108,7 +119,7 @@ In this config file,
  - you can change: `nvidia.com/gpu: 1` to request more gpus
  - you can see at the end that mlodata1 is mounted. You can remove it or change it for mloscratch
  - you specify which command is run when launching the pod. Here it will sleep for 60 seconds and then stop
- 
+
  #### Commands
 
 - To have a container run forever, you can use:
