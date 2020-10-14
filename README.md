@@ -25,7 +25,7 @@ mkdir .kube
 mv .kube/*.config .kube/config
 ```
 
-## Installing Kubernetes
+## Installing the Kubernetes client on your personal machine
 
 ### Ubuntu/Debian
 ```bash
@@ -53,17 +53,19 @@ Follow instructions on [the kubernetes docs](https://kubernetes.io/docs/tasks/to
 ## Setting up Kubernetes
 
 To use a kubernetes pod, you need to:
- - [Create a Dockerfile with your needed config](#creating-a-dockerfile)
- - [Build a Docker image](#building-a-docker-image)
+ - [Create a Dockerfile to describe the experimental environment](#creating-a-dockerfile)
+ - [Build a Docker image from it](#building-a-docker-image)
  - [Push the docker image to ic-registry.epfl.ch/mlo/](#pushing-the-docker-image)
  - [Create a kubernetes config file](#creating-a-kubernetes-config-file)
 
 ### Creating a Dockerfile
 
-If you are new to docker, have a look at this very simple [Dockerfile](https://github.com/epfml/kubernetes-setup/blob/master/templates/pod-simple/Dockerfile). You should guess what is happening and add your own config.
+You can build your own Dockerfile based on this [basic example](https://github.com/epfml/kubernetes-setup/blob/master/templates/pod-simple/Dockerfile).\
+You can specify the software and Python packages you need in there.
 
-Put your gaspar id after `NB_USER=` and your uid after `NB_UID=`.\
-You can get you uid by using the `id` command on a cluster.
+To make sure you can access data on the network storage `mlodata1` and `mloraw`, you should make sure that the main user in your docker image has the same user ID as you have on EPFL's system.\
+To achieve this, put your Gaspar ID after `NB_USER=` and your UID after `NB_UID=`.\
+You can get you uid by using the `id` command on a an iccluster node.
 
 The `FROM` line allows you to choose an image to start from. You can choose from images on the [Dockerhub](https://hub.docker.com/) (or elsewhere).
 
@@ -74,17 +76,20 @@ Once you are happy with the Dockerfile, go to the directory of the Dockerfile an
 docker build . -t <your-tag>
 ```
 Replace `<your-tag>` by the name you want to give to this Docker image.\
-It is good practice to put your name first, for example `jaggi_base`.
+It is good practice to put your username first, for example `jaggi-base`.
 
 ### Pushing the Docker image
-When you will create a pod, the server will need a Docker image to build a container for you.\
-The server will go look for the docker image on https://ic-registry.epfl.ch/, so you should put your Docker image there.
+When you start a pod on the Kubernetes cluster, you tell it to run your docker image.\
+The cluster will search for your image on EPFLs internal docker repository [Harbor](https://ic-registry.epfl.ch/).\
+You should upload your create image to this repository.
 
-Go have a look at https://ic-registry.epfl.ch and use your gaspar credentials to login in.
-
+Go have a look at https://ic-registry.epfl.ch and use your gaspar credentials to login in. \
 There already is a group project named `mlo`. Please ask someone in the lab already using kubernetes to add you to the mlo group so that you can push your Docker image to that repository.
 
-#### Login Docker to ic-registry.epfl.ch/mlo/
+Now take the following steps:
+
+
+#### Login to Harbor on your personal machine
 
 Login to the server by running the following command
 
@@ -110,13 +115,13 @@ docker tag <your-tag> ic-registry.epfl.ch/mlo/<your-tag>
 docker push ic-registry.epfl.ch/mlo/<your-tag>
 ```
 
-### Creating a kubernetes config file
+### Creating a Kubernetes pod config file
 Have a look at (and download) this simple [kubernetes config file](https://github.com/epfml/kubernetes-setup/blob/master/templates/pod-simple/pod-gpu-mlodata.yaml).
 Fill all elements that are in \<brackets\> .\
 `<your-pod-name>` needs not be the same as `<your-docker-image-tag>` but again it is good practice to put your name first for the pod name, for example `jaggi-pod`.
 
 In this config file,
- - you can change: `nvidia.com/gpu: 1` to request more gpus
+ - you can change: `nvidia.com/gpu: 1` to request more or fewer gpus
  - you can see at the end that mlodata1 is mounted. You can remove it or change it for mloscratch
  - you specify which command is run when launching the pod. Here it will sleep for 60 seconds and then stop
 
